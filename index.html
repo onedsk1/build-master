@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Калькулятор для стройки</title>
+<style>
+:root{box-sizing:border-box;--bg:#f4f6f8;--card:#fff;--tx:#172536;--mut:#667789;--ac:#e56b08;--acx:#fff;--br:#dfe5eb;--res:#fff4e7;color-scheme:light}
+:root[data-theme="dark"]{--bg:#111820;--card:#1a2530;--tx:#edf3f8;--mut:#a6b4c2;--ac:#ff913d;--acx:#20160e;--br:#344352;--res:#2b251f;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}html{scroll-padding-top:16px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:0 0 calc(24px + env(safe-area-inset-bottom,0px))}
+.top{padding:calc(18px + env(safe-area-inset-top,0px)) 18px 20px;background:linear-gradient(135deg,#153b5b,#205d7b 60%,#e56b08);color:white;border-radius:0 0 24px 24px;box-shadow:0 8px 24px #16354a22}.topline{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px}.brand-icon{font-size:34px}.top h1{font-size:22px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.4px}.top p{margin:10px 0 0;font-size:13px;color:#f1f6fa;max-width:320px}.iconbtn{border:1px solid #ffffff55;background:#ffffff18;color:white;border-radius:12px;padding:9px 12px;font-size:18px;cursor:pointer}
+main{max-width:900px;margin:0 auto;padding:0 14px}.section-title{font-size:17px;font-weight:800;margin:20px 2px 8px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 1px 10px;scrollbar-width:thin}.tabs button{flex:0 0 auto;border:1px solid var(--br);background:var(--card);color:var(--tx);padding:10px 14px;border-radius:13px;font-size:14px;font-weight:650;cursor:pointer}.tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--br);border-radius:18px;padding:16px;margin-top:8px;box-shadow:0 4px 16px #152c4008}.g{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}.full{grid-column:1/-1}label{display:block;font-size:12px;font-weight:650;color:var(--mut);margin:11px 0 5px}input,select{width:100%;min-width:0;font:inherit;font-size:16px;padding:11px 12px;border-radius:11px;border:1px solid var(--br);background:var(--bg);color:var(--tx)}input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}.res{background:var(--res);border:1px solid var(--br);border-radius:14px;padding:13px;margin-top:16px}.res>div{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--br)}.res>div:last-child{border-bottom:0}.res b{font-size:20px;color:var(--ac)}.btn{margin-top:12px;width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:750;border:1px solid var(--ac);background:transparent;color:var(--ac);cursor:pointer}.btn.p{background:var(--ac);color:var(--acx)}.note{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.5}.row{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:7px 0}.row span{min-width:0;overflow-wrap:anywhere}.row input{width:90px;padding:7px;font-size:14px}.x{border:0;background:transparent;color:var(--mut);font-size:20px;cursor:pointer;padding:6px}.footer-note{max-width:900px;padding:14px 18px;margin:0 auto;color:var(--mut);font-size:12px}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.toolbar .btn{margin:0}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.metric{border:1px solid var(--br);border-radius:12px;padding:10px;background:var(--card)}.metric small{display:block;color:var(--mut);font-size:12px}.metric strong{display:block;font-size:18px;margin-top:3px;color:var(--ac)}.kind{font-size:11px;color:var(--mut);display:block}@media(max-width:520px){main{padding:0 12px}.top{padding-left:16px;padding-right:16px}.card{padding:13px}.g{gap:0 9px}.res>div{font-size:14px}.res b{font-size:19px}}@media(max-width:360px){.g{grid-template-columns:1fr}.full{grid-column:auto}}
+@media print{.tabs,.toolbar,.btn,.x,.g,h1,.note,input[type=checkbox]{display:none!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topline"><div class="brand"><span class="brand-icon" aria-hidden="true">🏗️</span><h1>Калькулятор<br>для стройки</h1></div><button class="iconbtn" id="themeBtn" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">☼</button></div><p>Расчёт материалов и сметы для вашего дома</p></header>
+<main><div class="section-title">Выберите расчёт</div><nav class="tabs" id="tabs" aria-label="Разделы калькулятора"></nav><div id="app" aria-live="polite"></div></main>
+<div class="footer-note"><div class="note">Расчёты предварительные и не заменяют проект, обследование грунта, конструктивный расчёт или смету подрядчика. Перед закупкой проверьте размеры, единицы, паспорт материала, запасы и местные нормы.</div><div id="testBox" hidden><button class="btn" id="runTests" type="button">Проверить контрольные формулы</button><div id="testReport" class="note" role="status"></div></div></div>
+<script>
+const $=s=>document.querySelector(s),ce=x=>Math.ceil(x-1e-9);
+const f=(x,d=2)=>x.toLocaleString('ru-RU',{maximumFractionDigits:d});
+const num=x=>{
+  const s=String(x).trim().replace(',','.');
+  if(s==='' || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(s)) return NaN;
+  const n=Number(s);
+  return Number.isFinite(n)&&n>=0?n:NaN;
+};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ld=(k,d)=>{try{const x=JSON.parse(localStorage.getItem(k));return x==null?d:x}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const N=(id,l,v,u,w)=>({id,l,v,u,w}),S=(id,l,o,v,w)=>({id,l,o,v,w}),R=(l,v,u,d=2,m)=>({l,v,u,d,m});
+const ST=['Фундамент','Стены','Кровля','Отделка','Инженерия','Участок','Другое'];
+
+const T=[
+{k:'house',n:'Дом',st:'Другое',f:[N('l','Длина дома',10,'м'),N('w','Ширина дома',8,'м'),N('h','Высота стен',2.7,'м'),N('o','Проёмы (окна, двери)',12,'м²'),N('a','Угол ската крыши',30,'°')],
+ c:g=>[R('Периметр',2*(g.l+g.w),'м',1),R('Площадь стен нетто',Math.max(0,2*(g.l+g.w)*g.h-g.o),'м²',1),R('Площадь застройки',g.l*g.w,'м²',1),R('Объём дома',g.l*g.w*g.h,'м³',1)],
+ note:'Введите размеры один раз. На вкладках расчётов появится кнопка «Подставить из размеров дома», она заполнит длину, периметр, высоту, проёмы и угол крыши.'},
+{k:'concrete',n:'Бетон',st:'Фундамент',f:[
+ S('t','Что заливаем',[['s','Ленточный фундамент'],['p','Плита / стяжка'],['c','Столбики (круглые)']],'s'),
+ N('l','Длина ленты',30,'м',g=>g.t=='s'),N('w','Ширина',.4,'м',g=>g.t=='s'),N('h','Высота',.8,'м',g=>g.t=='s'),
+ N('pl','Длина',6,'м',g=>g.t=='p'),N('pw','Ширина',4,'м',g=>g.t=='p'),N('pt','Толщина',.2,'м',g=>g.t=='p'),
+ N('cn','Количество',12,'шт',g=>g.t=='c'),N('cd','Диаметр',.3,'м',g=>g.t=='c'),N('ch','Глубина',1.5,'м',g=>g.t=='c'),
+ N('z','Запас',10,'%')],
+ c:g=>{let v=g.t=='s'?g.l*g.w*g.h:g.t=='p'?g.pl*g.pw*g.pt:g.cn*Math.PI*(g.cd/2)**2*g.ch;v*=1+g.z/100;const c=v*290;
+  return[R('Бетон',v,'м³',2,1),R('Цемент',c,'кг',0),R('Мешков по 50 кг',ce(c/50),'шт',0),R('Песок',v*780,'кг',0),R('Щебень',v*1080,'кг',0),R('Вода',v*190,'л',0)]},
+ note:'Объём геометрический, запас добавляется отдельно. Расход цемента, песка, щебня и воды — грубая справочная оценка, не рецептура бетона: состав назначают по требуемому классу, заполнителям и условиям эксплуатации. Глубину заложения определяют по грунтам, промерзанию и проекту.'},
+{k:'rebar',n:'Арматура',st:'Фундамент',f:[
+ N('l','Длина ленты',30,'м'),N('w','Ширина',.4,'м'),N('h','Высота',.8,'м'),N('n','Прутков продольно',4,'шт'),
+ S('d','Продольная, мм',[['0.617','10'],['0.888','12'],['1.21','14']],'0.888'),N('s','Шаг хомутов',.4,'м'),S('sd','Диаметр хомутов, мм',[['0.395','8'],['0.617','10']],'0.395'),N('cv','Защитный слой',50,'мм'),N('hk','Запас на загибы хомута',200,'мм')],
+ c:g=>{if(!(g.s>0&&g.l>0&&g.w>0&&g.h>0&&g.n>0))return[];const lon=g.l*g.n*1.1,cnt=ce(g.l/g.s)+1;
+  const cover=2*(g.cv||50)/1000,hook=(g.hk||200)/1000,wi=g.w-cover,hi=g.h-cover,stLen=Math.max(0,2*(wi+hi)+hook),st=cnt*stLen;
+  const longKg=lon*num(g.d),stKg=st*num(g.sd||'0.395');
+  return[R('Продольная арматура с запасом 10%',lon,'м',1,1),R('Прутков по 11,7 м',ce(lon/11.7),'шт',0),R('Хомутов Ø'+(num(g.sd||'0.395')>.5?'10':'8'),cnt,'шт',0),R('Длина одного хомута (оценка)',stLen,'м',2),R('Арматура на хомуты Ø'+(num(g.sd||'0.395')>.5?'10':'8'),st,'м',1),R('Вес продольной арматуры',longKg,'кг',1),R('Вес хомутов Ø'+(num(g.sd||'0.395')>.5?'10':'8')+' (оценка)',stKg,'кг',1),R('Общий вес арматуры',longKg+stKg,'кг',1)]},
+ note:'Предварительная оценка: защитный слой и запас на загибы можно менять; длина хомута считается по прямоугольному контуру. Вес погонного метра принят 0,395 кг/м для Ø8 или 0,617 кг/м для Ø10. Продольный запас 10% не заменяет расчёт анкеровки, нахлёстов и Г-/П-образных элементов в углах и пересечениях. Геометрия хомутов упрощена; диаметр, число стержней, шаг и защитный слой должны соответствовать проекту и нормам.'},
+{k:'blocks',n:'Газоблок',st:'Стены',f:[
+ N('p','Периметр стен',36,'м'),N('h','Высота',2.7,'м'),N('o','Проёмы',8,'м²'),N('th','Толщина стены',300,'мм'),
+ N('bl','Длина блока',625,'мм'),N('bh','Высота блока',250,'мм'),N('z','Запас',5,'%')],
+ c:g=>{const a=Math.max(0,g.p*g.h-g.o),b=g.bl*g.bh/1e6;if(!b)return[];const v=a*g.th/1000;
+  return[R('Блоков',ce(a/b*(1+g.z/100)),'шт',0,1),R('Площадь кладки',a,'м²'),R('Объём кладки',v,'м³'),R('Клей (~25 кг/м³)',v*25,'кг',0)]},
+ note:'Газобетон 625×250, пеноблок 600×200, кладка на клей. Армопояс и перемычки не учтены. Для кирпича есть отдельная вкладка.'},
+{k:'brick',n:'Кирпич / печь',st:'Стены',f:[
+ S('m','Что кладём',[['w','Стена'],['s','Печь / массив']],'w'),
+ S('t','Кирпич',[['s','Одинарный 250×120×65'],['e','Евро 250×120×88']],'s'),
+ N('p','Длина стены',10,'м',g=>g.m=='w'),N('h','Высота',2.5,'м',g=>g.m=='w'),
+ S('th','Толщина, в кирпичах',[['0.5','0,5 (120 мм)'],['1','1 (250 мм)'],['1.5','1,5'],['2','2']],'1',g=>g.m=='w'),N('o','Проёмы',4,'м²',g=>g.m=='w'),
+ N('a','Длина',1,'м',g=>g.m=='s'),N('b','Ширина',.7,'м',g=>g.m=='s'),N('c','Высота',2,'м',g=>g.m=='s'),N('k','Заполнение',55,'%',g=>g.m=='s'),
+ N('z','Запас',5,'%')],
+ c:g=>{const s=g.t=='s';let q,v;
+  if(g.m=='w'){const a=Math.max(0,g.p*g.h-g.o),th=num(g.th);q=a*(s?102:78)*th;v=a*(th==.5?.12:th*.255)}
+  else{v=g.a*g.b*g.c*g.k/100;q=v*(s?394:302)}
+  return[R('Кирпичей',ce(q*(1+g.z/100)),'шт',0,1),R('Объём кладки',v,'м³'),R('Раствор',v*(s?.23:.2),'м³')]},
+ note:'Шов принят 10 мм; нормы расхода ориентировочные и зависят от формата, шва и перевязки. Для печи расчёт только предварительный: количество и огнеупорные материалы определяют по порядовке и проекту.'},
+{k:'roof',n:'Кровля',st:'Кровля',f:[
+ S('t','Тип крыши',[['g','Двускатная'],['s','Односкатная'],['h','Вальмовая (4 ската)']],'g'),
+ N('l','Длина дома',8,'м'),N('w','Ширина дома',6,'м'),N('o','Свес',.5,'м'),N('a','Угол ската',30,'°'),N('s','Полезная ширина листа',1.1,'м')],
+ c:g=>{const a=g.a*Math.PI/180,co=Math.cos(a);if(!(g.l>0&&g.w>0&&g.o>=0&&g.a>0&&g.a<75&&co>0&&g.s>0))return[];const L=g.l+2*g.o,W=g.w+2*g.o,ta=Math.tan(a);let sl=0,A,h;
+  if(g.t=='g'){sl=(g.w/2+g.o)/co;A=2*sl*L;h=g.w/2*ta}
+  else if(g.t=='s'){sl=(g.w+2*g.o)/co;A=sl*L;h=g.w*ta}
+  else{A=L*W/co;h=Math.min(g.l,g.w)/2*ta}
+  const r=[R('Площадь кровли',A,'м²',1,1)];
+  if(sl){r.push(R('Длина ската',sl,'м',2),R('Листов на один скат по полезной ширине',ce(L/g.s),'шт',0));if(g.t=='g')r.push(R('Листов на оба ската (оценка)',2*ce(L/g.s),'шт',0));else r.push(R('Листов на односкатную кровлю (оценка)',ce(L/g.s),'шт',0))}
+  r.push(R(g.t=='g'?'Высота конька над стеной':'Высота подъёма над стеной',h,'м',2),R('Площадь с запасом 10%',A*1.1,'м²',1),R('Плёнки с нахлёстом 15%',A*1.15,'м²',1));return r},
+ note:'Геометрическая предварительная оценка. Для двускатной и односкатной крыши число листов считается по полезной ширине вдоль длины карниза; нахлёсты и раскрой могут увеличить количество. Для вальмовой крыши площадь считается по прямоугольной проекции с учётом свесов, делённой на cos угла, но листы нужно раскладывать отдельно по каждому скату. Высота подъёма указана над уровнем стен, без учёта конструкции конька. Проверяйте минимальный уклон, снеговую/ветровую нагрузку, крепёж и ограничения длины листа по проекту и документации покрытия.'},
+{k:'lumber',n:'Пиломатериал',st:'Стены',f:[
+ S('m','Что считаем',[['f','Каркас стен'],['r','Стропила']],'f'),
+ N('fl','Длина всех стен',28,'м',g=>g.m=='f'),N('fh','Высота',2.5,'м',g=>g.m=='f'),N('fs','Шаг стоек',.6,'м',g=>g.m=='f'),N('fo','Проёмов',6,'шт',g=>g.m=='f'),
+ N('rl','Длина дома',8,'м',g=>g.m=='r'),N('rc','Длина стропилины',4,'м',g=>g.m=='r'),N('rs','Шаг стропил',.8,'м',g=>g.m=='r'),
+ N('a','Сечение: ширина',50,'мм'),N('b','Высота',150,'мм'),N('ln','Длина доски',6,'м'),N('z','Запас',10,'%')],
+ c:g=>{let p,t;
+  if(g.m=='f'){if(!g.fs)return[];p=ce(g.fl/g.fs)+1+g.fo*4;t=p*g.fh+3*g.fl}
+  else{if(!g.rs)return[];p=2*(ce(g.rl/g.rs)+1);t=p*g.rc}
+  t*=1+g.z/100;
+  return[R('Объём',t*g.a*g.b/1e6,'м³',3,1),R('Погонных метров',t,'м',0),R('Досок',ce(t/(g.ln||6)),'шт',0),R(g.m=='f'?'Стоек':'Стропил',p,'шт',0)]},
+ note:'Каркас: +4 стойки на проём, обвязка в 3 ряда. Не учтены раскосы, перемычки и обрешётка. Сечение подбирают по пролёту и снеговой нагрузке.'},
+{k:'insul',n:'Утеплитель',st:'Отделка',f:[N('a','Площадь',60,'м²'),N('t','Толщина',100,'мм'),N('p','В упаковке',5.76,'м²'),N('z','Запас',10,'%')],
+ c:g=>{if(!g.p)return[];const A=g.a*(1+g.z/100);return[R('Упаковок',ce(A/g.p),'шт',0,1),R('С запасом',A,'м²',1),R('Объём',A*g.t/1000,'м³')]},
+ note:'Площадь в упаковке указана на ней. При утеплении в два слоя считайте каждый слой отдельно.'},
+{k:'paint',n:'Краска',st:'Отделка',f:[N('a','Площадь',40,'м²'),N('c','Слоёв',2),N('r','Расход на слой',8,'м²/л'),N('v','Банка',2.5,'л')],
+ c:g=>{if(!g.r)return[];const l=g.a*g.c/g.r;return[R('Краски',l,'л',1,1),R('Банок',g.v?ce(l/g.v):0,'шт',0)]},
+ note:'Расход смотрите на банке: обычно 6–12 м²/л, для пористых стен меньше.'},
+{k:'board',n:'Доска / обшивка',st:'Отделка',f:[N('a','Площадь',30,'м²'),N('w','Ширина доски',120,'мм'),N('l','Длина доски',6,'м'),N('z','Запас',10,'%')],
+ c:g=>{const one=g.w/1000*g.l;if(!one)return[];const q=ce(g.a*(1+g.z/100)/one);return[R('Досок',q,'шт',0,1),R('Погонных метров',q*g.l,'м',1)]},
+ note:'Для вагонки и террасной доски ширину считайте по рабочей части, без паза.'},
+{k:'mix',n:'Клей / смесь',st:'Отделка',f:[
+ S('m','Материал',[['1.5','Плиточный клей'],['1.6','Клей для газобетона'],['1.8','Штукатурка гипсовая'],['1.9','Штукатурка цементная'],['2','Пескобетонная стяжка']],'1.5'),
+ N('a','Площадь',20,'м²'),N('t','Толщина слоя',5,'мм'),N('b','Мешок',25,'кг'),N('z','Запас',10,'%')],
+ c:g=>{if(!g.b)return[];const kg=g.a*g.t*num(g.m)*(1+g.z/100);return[R('Сухой смеси',kg,'кг',0,1),R('Мешков',ce(kg/g.b),'шт',0)]},
+ note:'Расход в кг на м² на 1 мм слоя усреднён. Точный указан на упаковке.'},
+{k:'dig',n:'Земляные работы',st:'Фундамент',f:[N('l','Длина',30,'м'),N('w','Ширина',.5,'м'),N('d','Глубина',.8,'м'),N('k','Разрыхление',25,'%'),N('v','Объём кузова',10,'м³')],
+ c:g=>{const v=g.l*g.w*g.d,r=v*(1+g.k/100);return[R('Объём выемки',v,'м³',2,1),R('Разрыхлённого',r,'м³'),R('Рейсов',g.v?ce(r/g.v):0,'шт',0)]},
+ note:'Грунт при выемке разрыхляется, вывозить придётся больше, чем объём ямы.'},
+{k:'path',n:'Отмостка / дорожка',st:'Участок',f:[N('l','Длина',30,'м'),N('w','Ширина',1,'м'),N('t','Бетон, толщина',.1,'м'),N('s','Песок, подушка',.15,'м'),N('q','Щебень, подушка',.1,'м')],
+ c:g=>{const A=g.l*g.w;return[R('Площадь',A,'м²',1),R('Бетон',A*g.t,'м³',2,1),R('Песок (×1,15)',A*g.s*1.15,'м³'),R('Щебень (×1,15)',A*g.q*1.15,'м³')]},
+ note:'Песок и щебень с коэффициентом уплотнения 1,15. Нужны армосетка, деформационные швы и плёнка под бетон.'},
+{k:'septic',n:'Септик',st:'Участок',f:[N('p','Жильцов',4,'чел'),N('l','Воды на человека',200,'л/сут'),
+ S('d','Кольца (внутр. диаметр)',[['0.707','Ø1,0 м (0,71 м³)'],['1.59','Ø1,5 м (1,59 м³)'],['2.83','Ø2,0 м (2,83 м³)']],'1.59')],
+ c:g=>{const v=g.p*g.l*3/1000,rv=num(g.d);if(!rv)return[];return[R('Объём на 3 суток',v,'м³',2,1),R('Колец (одна камера)',ce(v/rv),'шт',0),R('Колец при двух камерах',ce(v*.66/rv)+ce(v*.34/rv),'шт',0)]},
+ note:'Расчёт по условному расходу воды и трём суткам — только предварительная оценка объёма, а не проект септика. Полезный объём зависит от уровня жидкости, осадка, камер и режима эксплуатации. Фильтрация, грунтовые воды, санитарные расстояния и допустимость решения проверяются по местным нормам и условиям участка.'},
+{k:'beds',n:'Грядки',st:'Участок',f:[N('l','Длина участка',20,'м'),N('w','Ширина',10,'м'),N('b','Ширина грядки',1,'м'),N('p','Ширина проходов',.5,'м')],
+ c:g=>{if(!g.b)return[];const k=Math.max(0,Math.floor((g.w+g.p)/(g.b+g.p))),A=k*g.b*g.l,t=g.l*g.w;
+  return[R('Грядок',k,'шт',0,1),R('Полезная площадь',A,'м²',1),R('Проходы',t-A,'м²',1),R('Использование',t?A/t*100:0,'%',0)]},
+ note:'Грядки идут вдоль длинной стороны. Ширина 1 м позволяет дотянуться с обеих сторон.'},
+{k:'tile',n:'Плитка',st:'Отделка',f:[N('a','Площадь укладки',12,'м²'),N('tl','Длина плитки',300,'мм'),N('tw','Ширина плитки',300,'мм'),N('tt','Толщина плитки',8,'мм'),N('tj','Ширина шва',3,'мм'),N('pk','Площадь в упаковке',1.44,'м²'),N('co','Расход клея',4.5,'кг/м²'),N('z','Запас',10,'%')],
+ c:g=>{const need=g.a*(1+g.z/100),ta=(g.tl+g.tj)*(g.tw+g.tj)/1e6,gr=g.a*((g.tl+g.tw)/(g.tl*g.tw))*g.tt*g.tj*1.6,gl=g.a*g.co;
+  return[R('Плитки с запасом',ce(need/ta),'шт',0,1),R('Упаковок',ce(need/g.pk),'шт',0),R('Затирка',gr,'кг',2),R('Клей',gl,'кг',0),R('Мешков клея по 25 кг',ce(gl/25),'шт',0)]},
+ note:'Для крупной плитки и диагональной укладки запас 12–15%. Расход клея зависит от зубца шпателя и ровности основания, смотрите упаковку.'},
+{k:'wall',n:'Обои',st:'Отделка',f:[N('p','Периметр комнат',14,'м'),N('h','Высота стен',2.7,'м'),N('w','Ширина рулона',.53,'м'),N('rl','Длина рулона',10.05,'м'),N('rp','Раппорт (подбор рисунка)',0,'см')],
+ c:g=>{const len=g.h+.1+g.rp/100,per=Math.floor(g.rl/len);if(per<1)return[];const strips=ce(g.p/g.w);return[R('Рулонов',ce(strips/per),'шт',0,1),R('Полос',strips,'шт',0),R('Полос из рулона',per,'шт',0)]},
+ note:'Проёмы можно вычесть из периметра, если окно или дверь шире полосы. Рулоны берите из одной партии.'},
+{k:'floor',n:'Пол',st:'Отделка',f:[N('a','Площадь пола',20,'м²'),N('p','Периметр',18,'м'),N('dw','Ширина дверных проёмов',1.6,'м'),N('pk','Площадь в упаковке',2.2,'м²'),N('z','Запас',7,'%')],
+ c:g=>{const m=g.a*(1+g.z/100),pl=Math.max(0,g.p-g.dw)*1.05;return[R('Ламинат / паркет с запасом',m,'м²',1,1),R('Упаковок',ce(m/g.pk),'шт',0),R('Подложка',g.a*1.05,'м²',1),R('Плинтус',pl,'м',1),R('Планок плинтуса 2,5 м',ce(pl/2.5),'шт',0)]},
+ note:'При диагональной укладке запас 10–15%. Подложку и плинтус смотрите по паспорту покрытия.'},
+{k:'gkl',n:'Гипсокартон',st:'Отделка',f:[N('a','Площадь обшивки',30,'м²'),N('sa','Площадь листа',3,'м²'),N('l','Слоёв',1),N('z','Запас',10,'%')],
+ c:g=>[R('Листов ГКЛ',ce(g.a*g.l*(1+g.z/100)/g.sa),'шт',0,1),R('Профиль ПП (ориентир)',g.a*2.5,'м',0),R('Саморезов (ориентир)',ce(g.a*g.l*25),'шт',0)],
+ note:'Лист 1200×2500 мм даёт 3 м². Профиль считается ориентировочно для шага 0,4 м, для стен с шагом 0,6 м его меньше.'},
+{k:'elec',n:'Электрика',st:'Инженерия',f:[N('s','Розеток',20,'шт'),N('sl','Кабеля на розетку',7,'м'),N('l','Светильников и выключателей',12,'шт'),N('ll','Кабеля на точку света',6,'м'),N('e','Отдельных линий (плита, бойлер)',2,'шт'),N('el','Длина отдельной линии',12,'м'),N('z','Запас',15,'%')],
+ c:g=>{const gs=ce(g.s/6),gl=ce(g.l/10);return[R('Кабель 3×2,5',(g.s*g.sl+g.e*g.el)*(1+g.z/100),'м',0,1),R('Кабель 3×1,5',g.l*g.ll*(1+g.z/100),'м',0),R('Подрозетников',g.s,'шт',0),R('Распределительных коробок',ce((g.s+g.l)/6),'шт',0),R('Групп розеток',gs,'шт',0),R('Групп света',gl,'шт',0),R('Автоматов всего',gs+gl+g.e,'шт',0)]},
+ note:'Это прикидка закупки. Сечение кабеля и номиналы автоматов считаются по мощности нагрузок. Проект, УЗО, заземление и монтаж должен выполнять квалифицированный электрик.'},
+{k:'heat',n:'Отопление',st:'Инженерия',f:[N('a','Площадь дома',80,'м²'),N('h','Высота потолков',2.7,'м'),S('k','Утепление',[['35','Хорошо утеплён (35 Вт/м³)'],['41','Обычный (41 Вт/м³)'],['50','Слабо утеплён (50 Вт/м³)']],'41'),N('sp','Мощность секции',170,'Вт')],
+ c:g=>{const P=g.a*g.h*num(g.k)/1000;return[R('Тепловая мощность',P,'кВт',1,1),R('Секций радиаторов',ce(P*1000/g.sp),'шт',0),R('Котёл с запасом 20%',P*1.2,'кВт',1)]},
+ note:'Расчёт по объёму это прикидка. Точный подбор делают по теплопотерям каждой комнаты. Если котёл греет ещё и горячую воду, добавьте 20–25% мощности.'},
+{k:'ufh',n:'Тёплый пол',st:'Инженерия',f:[N('a','Площадь укладки',20,'м²'),N('st','Шаг трубы',.15,'м'),N('sup','Подводка к коллектору',8,'м'),N('p','Периметр (демпферная лента)',18,'м')],
+ c:g=>{const len=g.a/g.st+g.sup;return[R('Труба с запасом 5%',len*1.05,'м',0,1),R('Контуров (до 80 м)',ce(len/80),'шт',0),R('Демпферная лента',g.p,'м',0),R('Утеплитель под трубу',g.a,'м²',1)]},
+ note:'Контур делают не длиннее 80–100 м для трубы 16 мм, контуры в одной комнате желательно выравнивать по длине. Шаг 0,15 м типичный, у стен чаще 0,1 м.'},
+{k:'water',n:'Водопровод',st:'Инженерия',f:[N('c','Холодная труба',30,'м'),N('h','Горячая труба',20,'м'),N('n','Точек водоразбора',8,'шт'),N('pe','Жильцов',4,'чел'),N('z','Запас',10,'%')],
+ c:g=>{const m=(g.c+g.h)*(1+g.z/100);return[R('Труба ППР',m,'м',0,1),R('Хлыстов по 4 м',ce(m/4),'шт',0),R('Шаровых кранов',g.n+2,'шт',0),R('Гибких подводок',g.n,'шт',0),R('Бойлер (ориентир)',g.pe*55,'л',0)]},
+ note:'Фитинги считайте по схеме разводки. Горячую трубу и трубы в холодных помещениях нужно утеплить. Диаметр трубы подбирают по расходу воды.'},
+{k:'sewer',n:'Канализация',st:'Инженерия',f:[N('l1','Горизонталь Ø110',8,'м'),N('l2','Горизонталь Ø50',5,'м'),N('hs','Высота стояка',2.7,'м')],
+ c:g=>[R('Труба Ø110',(g.l1+g.hs)*1.1,'м',1,1),R('Труба Ø50',g.l2*1.1,'м',1),R('Перепад на Ø110 (2 см/м)',g.l1*.02,'м',2),R('Перепад на Ø50 (3 см/м)',g.l2*.03,'м',2)],
+ note:'Минимальные уклоны: Ø110 не меньше 2 см на метр, Ø50 не меньше 3 см на метр. Ревизии на поворотах и вентиляция стояка выводятся выше кровли.'},
+{k:'stair',n:'Лестница',st:'Другое',f:[N('H','Высота подъёма (пол до пола)',3,'м'),N('h','Желаемая высота ступени',.17,'м'),N('w','Ширина марша',1,'м')],
+ c:g=>{const n=Math.max(1,Math.round(g.H/g.h)),r=g.H/n,b=.63-2*r;if(b<=0)return[];const run=(n-1)*b;
+  return[R('Ступеней',n,'шт',0,1),R('Высота ступени',r*1000,'мм',0),R('Проступь (ширина ступени)',b*1000,'мм',0),R('Длина марша в плане',run,'м',2),R('Длина косоура',Math.hypot(g.H,run),'м',2),R('Угол наклона',Math.atan(r/b)*180/Math.PI,'°',0)]},
+ note:'Удобная ступень подчиняется формуле: 2 высоты + проступь = 600–640 мм. Уклон 30–40° комфортный, свыше 45° уже крутая лестница. Площадки и повороты считайте отдельно.'},
+{k:'diag',n:'Разметка',st:'Фундамент',f:[N('w','Ширина',6,'м'),N('l','Длина',8,'м')],
+ c:g=>{const d=Math.hypot(g.w,g.l),k=Math.max(1,Math.floor(Math.min(g.w,g.l)/4));
+  return[R('Диагональ прямоугольника',d,'м',3),R('Для угла 3–4–5: отложите по одной стороне',3*k,'м',2),R('По другой стороне',4*k,'м',2),R('Расстояние между метками должно быть',5*k,'м',2)]},
+ note:'Обе диагонали прямоугольника должны совпасть. Допустимое расхождение зависит от проекта, для дома обычно единицы миллиметров. Угол 3–4–5 проверяют рулеткой от угла: 3 м по одной стороне, 4 м по другой, между метками 5 м.'},
+{k:'fence',n:'Забор',st:'Участок',f:[N('l','Длина забора',40,'м'),N('s','Шаг столбов',2.5,'м'),N('h','Высота забора',2,'м'),N('w','Полезная ширина листа',1.1,'м'),N('d','Глубина ямы',1,'м'),N('g','Диаметр ямы',.3,'м'),N('z','Запас',5,'%')],
+ c:g=>{if(!g.s||!g.w)return[];const p=ce(g.l/g.s)+1,rows=g.h>1.7?3:2;
+  return[R('Листов (профлист или штакетник)',ce(g.l/g.w*(1+g.z/100)),'шт',0,1),R('Столбов',p,'шт',0),R('Лаг, рядов: '+rows,g.l*rows,'м',0),R('Бетон под столбы',p*Math.PI*(g.g/2)**2*g.d,'м³',2)]},
+ note:'Ворота и калитку считайте отдельно: их ширину вычтите из длины. До 1,7 м высоты лаги обычно в 2 ряда, выше в 3 ряда (ориентир). Глубина ямы зависит от грунта и промерзания.'},
+{k:'smeta',n:'Смета',sm:1,f:[S('s','Этап',ST.map(x=>[x,x]),'Фундамент'),S('kind','Тип позиции',[['Материал','Материал'],['Работа','Работа'],['Доставка','Доставка'],['Прочее','Прочее']],'Материал'),{id:'n',l:'Наименование',v:'',txt:1},{id:'u',l:'Единица измерения',v:'шт',txt:1},N('q','Количество',1),N('p','Цена за единицу',0,'₽')],
+ note:'Сюда попадают результаты расчётов по кнопке «В смету». Список хранится на этом телефоне.'}
+];
+
+const WR={blocks:(g,r)=>{const v=r.find(x=>x.l=='Объём кладки');return v?[R('Вес блоков (D500, ориентир)',v.v*500,'кг',0)]:[]},
+ brick:(g,r)=>{const q=r.find(x=>x.l=='Кирпичей');return q?[R('Вес кирпича (ориентир)',q.v*(g.t=='s'?3.5:4.3),'кг',0)]:[]},
+ lumber:(g,r)=>{const v=r.find(x=>x.l=='Объём');return v?[R('Вес древесины (~500 кг/м³)',v.v*500,'кг',0)]:[]}};
+T.forEach(x=>{const w=WR[x.k],c=x.c;if(w&&c)x.c=g=>{const r=c(g);return r.concat(w(g,r))}});
+// --- подстановка размеров дома
+const hv=(id,d)=>V['house.'+id]===undefined?d:(num(V['house.'+id])||d);
+function getHouse(){const l=hv('l',10),w=hv('w',8),h=hv('h',2.7),o=hv('o',0),a=hv('a',30),p=2*(l+w);return{l,w,h,o,a,p,wa:Math.max(0,p*h-o)}}
+const HS={concrete:H=>({l:H.p,pl:H.l,pw:H.w}),rebar:H=>({l:H.p}),blocks:H=>({p:H.p,h:H.h,o:H.o}),brick:H=>({p:H.p,h:H.h,o:H.o}),roof:H=>({l:H.l,w:H.w,a:H.a}),lumber:H=>({fl:H.p,fh:H.h,rl:H.l}),insul:H=>({a:H.wa}),paint:H=>({a:H.wa}),dig:H=>({l:H.p}),path:H=>({l:H.p}),diag:H=>({w:H.w,l:H.l}),floor:H=>({a:H.l*H.w,p:H.p}),wall:H=>({p:H.p,h:H.h}),gkl:H=>({a:H.l*H.w}),heat:H=>({a:H.l*H.w,h:H.h})};
+let items=ld('items',[]);if(!Array.isArray(items))items=[];
+items=items.filter(i=>i&&typeof i.nm==='string'&&Number.isFinite(Number(i.q))&&Number(i.q)>=0&&Number.isFinite(Number(i.p))&&Number(i.p)>=0).map(i=>({...i,q:Number(i.q),p:Number(i.p),st:ST.includes(i.st)?i.st:'Другое',kind:['Материал','Работа','Доставка','Прочее'].includes(i.kind)?i.kind:'Материал',done:!!i.done}));
+let V=ld('vals',{});if(!V||typeof V!=='object')V={};
+let cur=T[0],last=[];
+
+const noteHtml=n=>{const a=n.split('. ');return a.length<=3?n:a.slice(0,2).join('. ')+'.<details><summary>Подробнее</summary>'+a.slice(2).join('. ')+'</details>'};
+const fld=x=>`<div id="w_${x.id}" class="${x.o||x.txt?'full':''}"><label for="${x.id}">${x.l}${x.u?', '+x.u:''}</label>`+
+ (x.o?`<select id="${x.id}" aria-label="${esc(x.l)}">${x.o.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`:`<input id="${x.id}" type="text"${x.txt?'':' inputmode="decimal" aria-label="'+esc(x.l)+'"' }>`)+'</div>';
+
+function show(k){
+ cur=T.find(t=>t.k==k)||T[0];sv('tab',cur.k);
+ $('#tabs').innerHTML=T.map(t=>`<button class="${t==cur?'on':''}" data-k="${t.k}">${t.n}</button>`).join('');
+ $('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.k));
+ $('#app').innerHTML=`<div class="card">${HS[cur.k]&&V['house.l']!==undefined?'<button class="btn" id="fromHouse">Подставить из размеров дома</button>':''}<div class="g">${cur.f.map(fld).join('')}</div>`+
+  (cur.sm?'<button class="btn p" id="add">Добавить позицию</button><div class="toolbar"><button class="btn" id="csv">Экспорт CSV</button><button class="btn" id="backup">Резервная копия</button><button class="btn" id="restore">Восстановить копию</button><button class="btn" id="prn">Печать / PDF</button><button class="btn" id="clearItems">Очистить смету</button></div><input id="backupFile" type="file" accept="application/json,.json" hidden>':'')+
+  `<div class="res" id="out" role="status" aria-live="polite" tabindex="-1"></div>`+(cur.sm?'<button class="btn" id="cpy">Копировать список</button><div id="cp" class="note"></div>':'')+
+  `<div class="note">${noteHtml(cur.note)}</div></div>`;
+ cur.f.forEach(x=>{const e=$('#'+x.id),s=V[cur.k+'.'+x.id];
+  e.value=(s!==undefined&&(!x.o||x.o.some(o=>o[0]===s)))?s:x.v;e.addEventListener('input',upd);e.addEventListener('change',upd)});
+ if(cur.sm){$('#add').onclick=addItem;$('#csv').onclick=exportCSV;$('#prn').onclick=()=>{try{window.print()}catch(e){notify('Печать недоступна в этом окне.')}};$('#backup').onclick=backupData;$('#restore').onclick=()=>$('#backupFile').click();$('#backupFile').onchange=restoreData;$('#clearItems').onclick=clearItems;}
+ const fb=$('#fromHouse');if(fb)fb.onclick=()=>{const m=HS[cur.k](getHouse());Object.keys(m).forEach(id=>{const e=$('#'+id);if(e&&Number.isFinite(m[id]))e.value=String(Math.round(m[id]*100)/100)});upd()};
+ upd();
+}
+function vals(){const g={};cur.f.forEach(x=>{const r=$('#'+x.id).value;g[x.id]=x.o||x.txt?r:num(r)});return g}
+function upd(){
+ const g=vals();cur.f.forEach(x=>{V[cur.k+'.'+x.id]=$('#'+x.id).value;$('#w_'+x.id).hidden=x.w?!x.w(g):false});sv('vals',V);
+ const o=$('#out');
+ if(cur.sm){o.innerHTML=listHtml();const reserve=$('#reserve');if(reserve)reserve.addEventListener('change',()=>{const n=num(reserve.value);if(!Number.isFinite(n)||n>100){upd();notify('Резерв должен быть от 0 до 100%.');return}sv('reservePercent',n);upd()});return}
+ const invalid=cur.f.filter(x=>!x.o&&!x.txt&&!$('#w_'+x.id).hidden&&!Number.isFinite(g[x.id]));
+ cur.f.forEach(x=>$('#'+x.id).setAttribute('aria-invalid',invalid.includes(x)?'true':'false'));
+ if(invalid.length){last=[];o.innerHTML='<div role="alert"><b>Проверьте исходные данные</b><div>'+invalid.map(x=>esc(x.l)).join(', ')+': введите число не меньше нуля. Для дробей используйте точку или запятую.</div></div>';return}
+ // Геометрические проверки предотвращают молчаливые нулевые и физически невозможные результаты.
+ const positiveBySection={stair:['H','h','w'],tile:['a','tl','tw','tt','tj','pk','co'],wall:['p','h','w','rl'],floor:['a','pk'],gkl:['a','sa','l'],heat:['a','h','sp'],ufh:['a','st'],concrete:['l','w','h','pl','pw','pt','cn','cd','ch'],rebar:['l','w','h','n','s','cv','hk'],blocks:['p','h','th','bl','bh'],brick:['p','h','a','b','c'],roof:['l','w','s'],lumber:['fl','fh','fs','rl','rc','rs','a','b','ln'],insul:['a','t','p'],paint:['a','c','r','v'],board:['a','w','l'],mix:['a','t','b'],dig:['l','w','d','v'],path:['l','w','t'],septic:['p','l'],beds:['l','w','b']};
+ const required=(positiveBySection[cur.k]||[]).filter(id=>$('#w_'+id)&&!$('#w_'+id).hidden&&(!(g[id]>0)));
+ const problems=[];
+ if(required.length) problems.push('Эти размеры и параметры должны быть больше нуля: '+required.map(id=>cur.f.find(x=>x.id===id)?.l||id).join(', ')+'.');
+ if(cur.k==='blocks' && g.o>g.p*g.h) problems.push('Площадь проёмов не может превышать общую площадь стен.');
+ if(cur.k==='brick' && g.m==='w' && g.o>g.p*g.h) problems.push('Площадь проёмов не может превышать общую площадь стены.');
+ if(cur.k==='roof' && (!(g.a>0&&g.a<75))) problems.push('Для предварительного расчёта укажите угол ската больше 0° и меньше 75°; допустимый уклон зависит от покрытия и проекта.');
+ if(cur.k==='roof' && g.o<0) problems.push('Свес не может быть отрицательным.');
+ if(cur.k==='concrete' && g.z>100) problems.push('Запас бетона больше 100% выглядит необычно — проверьте введённое значение.');
+ if(cur.k==='rebar' && g.s>g.l*2) problems.push('Шаг хомутов больше длины ленты: проверьте единицы измерения.');
+ if(problems.length){last=[];o.innerHTML='<div role="alert"><b>Нужно проверить исходные данные</b><div>'+problems.map(esc).join('</div><div>')+'</div></div>';return}
+ last=cur.c(g).filter(r=>Number.isFinite(r.v));
+ o.innerHTML=last.map(r=>`<div>${r.l}: ${r.m?'<b>':''}${f(r.v,r.d)} ${r.u}${r.m?'</b>':''}</div>`).join('')+
+  (last.some(r=>r.m)?'<button class="btn" id="tos">➕ В смету</button>':'');
+ const b=$('#tos');if(b)b.onclick=toSmeta;
+}
+function toSmeta(){const r=last.find(r=>r.m);if(!r)return;
+ items.push({nm:r.l+' ('+cur.n+')',u:r.u,q:Math.round(r.v*10000)/10000,p:priceFor(r.l+' ('+cur.n+')'),st:cur.st,kind:'Материал'});sv('items',items);show('smeta')}
+function addItem(){
+  const g=vals();
+  if(!Number.isFinite(g.q)||!Number.isFinite(g.p)){
+    $('#out').innerHTML='<div role="alert"><b>Проверьте ввод</b><div>Количество и цена должны быть числами не меньше нуля. Десятичные дроби можно вводить через точку или запятую.</div></div>';
+    return;
+  }
+  if(!(g.n||'').trim()){ $('#out').innerHTML='<div role="alert"><b>Укажите наименование</b><div>Введите название материала, работы или расхода.</div></div>'; $('#n').focus(); return; }
+  items.push({nm:(g.n||'').trim(),u:(g.u||'').trim(),q:g.q,p:g.p||priceFor((g.n||'').trim()),st:g.s,kind:g.kind||'Материал'});if(g.p>0)savePrice((g.n||'').trim(),g.p);
+  $('#n').value='';sv('items',items);upd()
+}
+const priceFor=nm=>{const p=Number(ld('prices',{})[nm]);return Number.isFinite(p)&&p>0?p:0};
+function savePrice(nm,p){const x=ld('prices',{});x[nm]=p;sv('prices',x)}
+function toggleShop(){sv('shop',!ld('shop',false));upd()}
+function setP(i,v){const p=num(v);if(!Number.isFinite(p)){upd();notify('Цена должна быть числом не меньше нуля. Используйте точку или запятую.');return}items[i].p=p;if(p>0)savePrice(items[i].nm,p);sv('items',items);upd()}
+function delItem(i){items.splice(i,1);sv('items',items);upd()}
+function listHtml(){
+ let total=0,bought=0,materials=0,works=0,delivery=0,other=0,h='';
+ ST.forEach(stage=>{
+  const rows=items.map((it,i)=>[it,i]).filter(([it])=>(it.st||'Другое')===stage);
+  if(!rows.length)return;
+  let sub=0; h+=`<div style="margin-top:14px"><b>${esc(stage)}</b></div>`;
+  rows.forEach(([it,i])=>{
+   const price=Number(it.p)||0,qty=Number(it.q)||0,sum=price*qty;sub+=sum;total+=sum;if(it.done)bought+=sum;
+   if((it.kind||'Материал')==='Работа')works+=sum;else if(it.kind==='Доставка')delivery+=sum;else if(it.kind==='Прочее')other+=sum;else materials+=sum;
+   if(ld('shop',false)&&it.done)return;
+   h+=`<div class="row"><span><label style="display:inline-flex;gap:8px;align-items:center;margin:0;font-size:inherit;color:inherit"><input type="checkbox" style="width:22px;height:22px;padding:0" aria-label="Куплено: ${esc(it.nm)}" ${it.done?'checked':''} onchange="toggleDone(${i},this.checked)"><b${it.done?' style="text-decoration:line-through;opacity:.6"':''}>${esc(it.nm)}</b></label><span class="kind">${esc(it.kind||'Материал')}</span>${f(qty)} ${esc(it.u||'')} × <input aria-label="Цена за единицу для ${esc(it.nm)}" type="text" inputmode="decimal" value="${price}" onchange="setP(${i},this.value)"> = <b>${f(sum)} ₽</b></span><button class="x" aria-label="Удалить ${esc(it.nm)}" onclick="delItem(${i})">✕</button></div>`;
+  });
+  h+=`<div class="note">Итого по этапу: <b>${f(sub)} ₽</b></div>`;
+ });
+ const reserveRaw=ld('reservePercent',10);const reserve=Number.isFinite(Number(reserveRaw))?Math.min(100,Math.max(0,Number(reserveRaw))):10;
+ const reserveAmount=total*reserve/100;
+ return (items.length?'<button class="btn" onclick="toggleShop()">'+(ld('shop',false)?'Показать всё':'В магазин: только некупленное')+'</button>':'')+(h||'<div>Список пуст. Добавьте материалы или работы.</div>')+
+ `<div class="summary-grid"><div class="metric"><small>Материалы</small><strong>${f(materials)} ₽</strong></div><div class="metric"><small>Работы</small><strong>${f(works)} ₽</strong></div><div class="metric"><small>Доставка</small><strong>${f(delivery)} ₽</strong></div><div class="metric"><small>Прочее</small><strong>${f(other)} ₽</strong></div><div class="metric"><small>Резерв, %</small><input id="reserve" aria-label="Резерв бюджета в процентах" inputmode="decimal" value="${reserve}" style="margin-top:5px;padding:7px"></div><div class="metric"><small>Резерв, сумма</small><strong>${f(reserveAmount)} ₽</strong></div></div><div class="res"><div>Смета без резерва <b>${f(total)} ₽</b></div><div>Итого с резервом <b>${f(total+reserveAmount)} ₽</b></div><div>Куплено <b>${f(bought)} ₽</b></div><div>Осталось докупить <b>${f(total-bought)} ₽</b></div></div><div class="note" id="smMsg" role="status" aria-live="polite"></div>`;
+}
+function toggleDone(i,v){if(items[i]){items[i].done=!!v;sv('items',items);upd()}}
+function notify(m){const e=$('#smMsg');if(e)e.textContent=m}
+function inlineConfirm(msg,yes){const e=$('#smMsg');if(!e)return yes();e.innerHTML=esc(msg)+'<div class="toolbar"><button class="btn" id="cfYes">Да</button><button class="btn" id="cfNo">Отмена</button></div>';$('#cfYes').onclick=()=>{e.textContent='';yes()};$('#cfNo').onclick=()=>{e.textContent=''}}
+function csvCell(v){if(typeof v==='number')return '"'+String(v).replace('.',',')+'"';let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function downloadFile(name,content,type){try{const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){}
+ const m=$('#smMsg');if(m)m.innerHTML='Если файл не скачался (например, в окне Claude), скопируйте текст ниже.<textarea readonly rows="5" style="width:100%;font-size:13px;margin-top:8px;padding:8px;border-radius:10px;border:1px solid var(--br);background:var(--bg);color:var(--tx)">'+esc(content)+'</textarea>'}
+function exportCSV(){const rows=[['Этап','Тип','Наименование','Единица','Количество','Цена за единицу','Сумма','Куплено']];items.forEach(it=>rows.push([it.st||'Другое',it.kind||'Материал',it.nm,it.u||'',it.q,it.p,Math.round((Number(it.q)||0)*(Number(it.p)||0)*100)/100,it.done?'да':'нет']));const total=items.reduce((a,it)=>a+(Number(it.q)||0)*(Number(it.p)||0),0);rows.push(['','','','','','Итого',Math.round(total*100)/100]);const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n');downloadFile('smeta-stroitelstvo.csv',csv,'text/csv;charset=utf-8')}
+function backupData(){downloadFile('stroika-backup.json',JSON.stringify({version:1,items,vals:V,tab:cur.k,theme:document.documentElement.dataset.theme,reservePercent:ld('reservePercent',10)},null,2),'application/json;charset=utf-8')}
+function restoreData(ev){const file=ev.target.files&&ev.target.files[0];if(!file)return;const reader=new FileReader();
+reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!data||!Array.isArray(data.items)||!data.vals||typeof data.vals!=='object')throw new Error();
+const clean=data.items.filter(it=>it&&typeof it.nm==='string'&&Number.isFinite(Number(it.q))&&Number(it.q)>=0&&Number.isFinite(Number(it.p))&&Number(it.p)>=0).map(it=>({nm:it.nm,u:String(it.u||''),q:Number(it.q),p:Number(it.p),st:ST.includes(it.st)?it.st:'Другое',kind:['Материал','Работа','Доставка','Прочее'].includes(it.kind)?it.kind:'Материал',done:!!it.done}));
+const vv=Object.fromEntries(Object.entries(data.vals).filter(e=>typeof e[1]==='string'));
+inlineConfirm('Восстановить копию? Текущая смета будет заменена. Позиций: '+clean.length+'.',()=>{items=clean;V=vv;sv('items',items);sv('vals',V);
+ const rp=Number(data.reservePercent);if(Number.isFinite(rp))sv('reservePercent',Math.min(100,Math.max(0,rp)));
+ if(data.theme==='dark'||data.theme==='light'){document.documentElement.dataset.theme=data.theme;sv('theme',data.theme)}show('smeta')})}
+catch(e){notify('Не удалось восстановить копию: файл имеет неверный формат или повреждён.')}finally{ev.target.value=''}};reader.readAsText(file)}
+function clearItems(){if(!items.length)return;inlineConfirm('Удалить все позиции сметы? Отменить нельзя без резервной копии.',()=>{items=[];sv('items',items);upd()})}
+
+function copyList(){let tot=0;
+ const txt=items.map((it,i)=>{const s=it.q*it.p;tot+=s;return(i+1)+'. ['+(it.st||'Другое')+'] '+it.nm+': '+f(it.q)+' '+(it.u||'')+' × '+f(it.p)+' = '+f(s)+' ₽'}).join('\n')+'\nИтого: '+f(tot)+' ₽';
+ const fb=()=>{$('#cp').innerHTML='<textarea readonly rows="6" style="width:100%;font-size:14px;margin-top:8px;padding:8px;border-radius:10px;border:1px solid var(--br);background:var(--bg);color:var(--tx)">'+esc(txt)+'</textarea>'};
+ try{navigator.clipboard.writeText(txt).then(()=>{$('#cp').textContent='Скопировано ✓'},fb)}catch(e){fb()}}
+
+function runFormulaTests(){
+ // Проверяем реальные функции расчёта из массива T, а не повторяем формулы отдельно в тесте.
+ const cases=[
+  {key:'concrete',name:'Объём бетона для ленты с запасом',g:{t:'s',l:30,w:.4,h:.8,pl:6,pw:4,pt:.2,cn:12,cd:.3,ch:1.5,z:10},label:'Бетон',want:10.56},
+  {key:'blocks',name:'Площадь газобетонной кладки за вычетом проёмов',g:{p:36,h:2.7,o:8,th:300,bl:625,bh:250,z:5},label:'Площадь кладки',want:89.2},
+  {key:'blocks',name:'Объём газобетонной кладки',g:{p:36,h:2.7,o:8,th:300,bl:625,bh:250,z:5},label:'Объём кладки',want:26.76},
+  {key:'insul',name:'Площадь утеплителя с запасом',g:{a:60,t:100,p:5.76,z:10},label:'С запасом',want:66},
+  {key:'insul',name:'Количество упаковок утеплителя',g:{a:60,t:100,p:5.76,z:10},label:'Упаковок',want:12},
+  {key:'dig',name:'Объём земляной выемки',g:{l:30,w:.5,d:.8,k:25,v:10},label:'Объём выемки',want:12},
+  {key:'dig',name:'Объём разрыхлённого грунта',g:{l:30,w:.5,d:.8,k:25,v:10},label:'Разрыхлённого',want:15},
+  {key:'dig',name:'Количество рейсов самосвала',g:{l:30,w:.5,d:.8,k:25,v:10},label:'Рейсов',want:2},
+  {key:'roof',name:'Площадь двускатной кровли',g:{t:'g',l:8,w:6,o:.5,a:30,s:1.1},label:'Площадь кровли',want:2*((3+.5)/Math.cos(Math.PI/6))*9},
+  {key:'concrete',name:'Бетон для плиты',g:{t:'p',pl:6,pw:4,pt:.2,z:10},label:'Бетон',want:5.28},
+  {key:'rebar',name:'Продольная арматура',g:{l:30,w:.4,h:.8,n:4,d:'0.888',s:.4,sd:'0.395',cv:50,hk:200},label:'Продольная арматура с запасом 10%',want:132},
+  {key:'rebar',name:'Число хомутов',g:{l:30,w:.4,h:.8,n:4,d:'0.888',s:.4,sd:'0.395',cv:50,hk:200},label:'Хомутов Ø8',want:76},
+  {key:'rebar',name:'Общий вес арматуры',g:{l:30,w:.4,h:.8,n:4,d:'0.888',s:.4,sd:'0.395',cv:50,hk:200},label:'Общий вес арматуры',want:183.26},
+  {key:'brick',name:'Кирпич в стене',g:{m:'w',t:'s',p:10,h:2.5,th:'1',o:4,z:5,k:55},label:'Кирпичей',want:2250},
+  {key:'brick',name:'Кирпич в печи',g:{m:'s',t:'e',a:1,b:.7,c:2,z:5,k:55},label:'Кирпичей',want:245},
+  {key:'lumber',name:'Объём каркаса',g:{m:'f',fl:28,fh:2.5,fs:.6,fo:6,a:50,b:150,ln:6,z:10},label:'Объём',want:2.178},
+  {key:'lumber',name:'Стойки каркаса',g:{m:'f',fl:28,fh:2.5,fs:.6,fo:6,a:50,b:150,ln:6,z:10},label:'Стоек',want:72},
+  {key:'lumber',name:'Стропила',g:{m:'r',rl:8,rc:4,rs:.8,a:50,b:150,ln:6,z:10},label:'Стропил',want:22},
+  {key:'septic',name:'Кольца Ø1,0, одна камера',g:{p:4,l:200,d:'0.707'},label:'Колец (одна камера)',want:4},
+  {key:'septic',name:'Кольца Ø1,0, две камеры',g:{p:4,l:200,d:'0.707'},label:'Колец при двух камерах',want:5},
+  {key:'path',name:'Песок под дорожку',g:{l:30,w:1,t:.1,s:.15,q:.1},label:'Песок (×1,15)',want:5.175},
+  {key:'mix',name:'Мешков смеси',g:{m:'1.5',a:20,t:5,b:25,z:10},label:'Мешков',want:7},
+  {key:'paint',name:'Банок краски',g:{a:40,c:2,r:8,v:2.5},label:'Банок',want:4},
+  {key:'board',name:'Досок обшивки',g:{a:30,w:120,l:6,z:10},label:'Досок',want:46},
+  {key:'beds',name:'Число грядок',g:{l:20,w:10,b:1,p:.5},label:'Грядок',want:7},
+  {key:'roof',name:'Односкатная кровля',g:{t:'s',l:8,w:6,o:.5,a:30,s:1.1},label:'Площадь кровли',want:63/Math.cos(Math.PI/6)},
+  {key:'roof',name:'Вальмовая кровля',g:{t:'h',l:8,w:6,o:.5,a:30,s:1.1},label:'Площадь кровли',want:63/Math.cos(Math.PI/6)},
+  {key:'house',name:'Периметр дома',g:{l:10,w:8,h:2.7,o:12,a:30},label:'Периметр',want:36},
+  {key:'house',name:'Площадь стен нетто',g:{l:10,w:8,h:2.7,o:12,a:30},label:'Площадь стен нетто',want:85.2},
+  {key:'diag',name:'Диагональ 6×8',g:{w:6,l:8},label:'Диагональ прямоугольника',want:10},
+  {key:'fence',name:'Листов забора',g:{l:40,s:2.5,h:2,w:1.1,d:1,g:.3,z:5},label:'Листов (профлист или штакетник)',want:39},
+  {key:'fence',name:'Столбов забора',g:{l:40,s:2.5,h:2,w:1.1,d:1,g:.3,z:5},label:'Столбов',want:17},
+  {key:'blocks',name:'Вес газоблока',g:{p:36,h:2.7,o:8,th:300,bl:625,bh:250,z:5},label:'Вес блоков (D500, ориентир)',want:13380},
+  {key:'tile',name:'Плиток 300×300',g:{a:12,tl:300,tw:300,tt:8,tj:3,pk:1.44,co:4.5,z:10},label:'Плитки с запасом',want:144},
+  {key:'tile',name:'Затирка',g:{a:12,tl:300,tw:300,tt:8,tj:3,pk:1.44,co:4.5,z:10},label:'Затирка',want:3.072},
+  {key:'wall',name:'Рулонов обоев',g:{p:14,h:2.7,w:.53,rl:10.05,rp:0},label:'Рулонов',want:9},
+  {key:'floor',name:'Упаковок ламината',g:{a:20,p:18,dw:1.6,pk:2.2,z:7},label:'Упаковок',want:10},
+  {key:'floor',name:'Планок плинтуса',g:{a:20,p:18,dw:1.6,pk:2.2,z:7},label:'Планок плинтуса 2,5 м',want:7},
+  {key:'gkl',name:'Листов ГКЛ',g:{a:30,sa:3,l:1,z:10},label:'Листов ГКЛ',want:11},
+  {key:'elec',name:'Кабель 3×2,5',g:{s:20,sl:7,l:12,ll:6,e:2,el:12,z:15},label:'Кабель 3×2,5',want:188.6},
+  {key:'elec',name:'Автоматов всего',g:{s:20,sl:7,l:12,ll:6,e:2,el:12,z:15},label:'Автоматов всего',want:8},
+  {key:'heat',name:'Секций радиаторов',g:{a:80,h:2.7,k:'41',sp:170},label:'Секций радиаторов',want:53},
+  {key:'ufh',name:'Контуров тёплого пола',g:{a:20,st:.15,sup:8,p:18},label:'Контуров (до 80 м)',want:2},
+  {key:'water',name:'Труба ППР',g:{c:30,h:20,n:8,pe:4,z:10},label:'Труба ППР',want:55},
+  {key:'water',name:'Бойлер',g:{c:30,h:20,n:8,pe:4,z:10},label:'Бойлер (ориентир)',want:220},
+  {key:'sewer',name:'Труба Ø110',g:{l1:8,l2:5,hs:2.7},label:'Труба Ø110',want:11.77},
+  {key:'sewer',name:'Перепад на Ø110',g:{l1:8,l2:5,hs:2.7},label:'Перепад на Ø110 (2 см/м)',want:.16},
+  {key:'stair',name:'Ступеней лестницы',g:{H:3,h:.17,w:1},label:'Ступеней',want:18},
+  {key:'stair',name:'Проступь',g:{H:3,h:.17,w:1},label:'Проступь (ширина ступени)',want:630-2*3000/18},
+  {key:'stair',name:'Длина марша',g:{H:3,h:.17,w:1},label:'Длина марша в плане',want:17*(.63-2*3/18)},
+  {key:'brick',name:'Вес кирпича',g:{m:'w',t:'s',p:10,h:2.5,th:'1',o:4,z:5,k:55},label:'Вес кирпича (ориентир)',want:7875}
+ ];
+ const results=cases.map(t=>{
+  try{
+   const section=T.find(x=>x.k===t.key);const rows=section&&section.c(t.g);const row=rows&&rows.find(x=>x.l===t.label);
+   const got=row?row.v:NaN;return {...t,got,pass:Number.isFinite(got)&&Math.abs(got-t.want)<1e-8};
+  }catch(e){return {...t,got:NaN,pass:false}}
+ });
+ const failed=results.filter(t=>!t.pass);[['esc кавычек',esc('a"b\'c')==='a&quot;b&#39;c'],['num: запятая',num('1,5')===1.5],['ce без погрешности',ce(12+1e-12)===12]].forEach(x=>{if(!x[1])failed.push({name:x[0],got:NaN,want:0})});const el=$('#testReport');
+ if(failed.length){el.innerHTML='<b>Не пройдены тесты ('+failed.length+'/'+results.length+'):</b><ul>'+failed.map(t=>'<li>'+esc(t.name)+': получено '+(Number.isFinite(t.got)?f(t.got):'ошибка')+', ожидалось '+f(t.want)+'</li>').join('')+'</ul>';el.style.color='#b42318'}
+ else {el.textContent='Успешно: '+results.length+' тестов прошли через реальные функции расчёта приложения. Это проверяет выбранные примеры, но не все разделы и не подтверждает пригодность расчётов для проектирования.';el.style.color='var(--mut)'}
+}
+$('#runTests').addEventListener('click',runFormulaTests);if(location.hash==='#test')$('#testBox').hidden=false;
+
+const savedTheme=ld('theme',window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=savedTheme;$('#themeBtn').textContent=savedTheme==='dark'?'☾':'☼';$('#themeBtn').addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=next;sv('theme',next);$('#themeBtn').textContent=next==='dark'?'☾':'☼'});show(ld('tab','concrete'));
+</script>
+</body>
+</html>
